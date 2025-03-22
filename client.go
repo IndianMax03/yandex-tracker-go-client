@@ -1,3 +1,4 @@
+// The client package provides methods for interacting with Yandex Tracker
 package client
 
 import "resty.dev/v3"
@@ -9,10 +10,12 @@ const (
 	defaultAuthScheme  = "OAuth"
 )
 
+// Client is a wrapper over the resty.Client type with Yandex Tracker API-specific headers and a base URL
 type Client struct {
 	restyClient *resty.Client
 }
 
+// Create a new Client
 func New(tokenOAuth, xCloudOrgID, xOrgID, acceptLanguage string) *Client {
 	var lang string
 	headers := map[string]string{}
@@ -39,6 +42,7 @@ func New(tokenOAuth, xCloudOrgID, xOrgID, acceptLanguage string) *Client {
 	}
 }
 
+// Send request to Yandex Tracker
 func (c *Client) SendRequest(method, resourceURL string, requestBody, responseBody any) (resp *resty.Response, err error) {
 	req := c.restyClient.R().
 		SetContentType(defaultContentType).
