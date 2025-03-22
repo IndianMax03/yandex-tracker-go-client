@@ -14,7 +14,7 @@ TODO
 
 # License
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-red.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-red.svg)](https://github.com/IndianMax03/yandex-tracker-go-client/blob/main/LICENSE)
 
 # Reference
 
