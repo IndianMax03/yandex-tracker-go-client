@@ -18,4 +18,4 @@ TODO
 
 # Reference
 
-[![Go Reference][https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white]][https://pkg.go.dev/github.com/IndianMax03/yandex-tracker-go-client]
+[![reference](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://pkg.go.dev/github.com/IndianMax03/yandex-tracker-go-client)
