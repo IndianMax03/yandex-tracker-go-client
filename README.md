@@ -18,4 +18,4 @@ TODO
 
 # Reference
 
-[![Go Reference](https://pkg.go.dev/badge/badge/github.com/IndianMax03/yandex-tracker-go-client.svg)](https://pkg.go.dev/badge/github.com/IndianMax03/yandex-tracker-go-client)
+[![Go Reference](https://pkg.go.dev/badge/badge/github.com/IndianMax03/yandex-tracker-go-client.svg)](https://pkg.go.dev/github.com/IndianMax03/yandex-tracker-go-client)
