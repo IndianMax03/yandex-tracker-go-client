@@ -1,7 +1,12 @@
-// The client package provides methods for interacting with Yandex Tracker
+// The client package provides methods, values and models for interacting with Yandex Tracker
 package client
 
-import "resty.dev/v3"
+import (
+	"fmt"
+	"io"
+
+	"resty.dev/v3"
+)
 
 const (
 	baseURL            = "https://api.tracker.yandex.net/v2/"
@@ -50,8 +55,49 @@ func (c *Client) SendRequest(method, resourceURL string, requestBody, responseBo
 		SetBody(requestBody).
 		SetResult(responseBody).
 		SetURL(c.restyClient.BaseURL() + resourceURL)
-
-	req.SetDebug(true)
 	resp, err = req.Send()
 	return
+}
+
+// Allow logging of details of each request and response.
+func (c *Client) SetDebug(debug bool) {
+	c.restyClient.SetDebug(debug)
+}
+
+// Create a new issue
+func (c *Client) CreateIssue(req *IssueCreateRequest) (*IssueCreateResponse, error) {
+	var respBody IssueCreateResponse
+	res, err := c.SendRequest(
+		resty.MethodPost,
+		issuesCreateURL,
+		req,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("Request failed with status code: %s. Body: %s", res.Status(), body)
+	}
+	return &respBody, nil
+}
+
+// Get the number of issues
+func (c *Client) GetIssuesCount(req *IssueCountRequest) (int, error) {
+	var respBody IssueCountResponse
+	res, err := c.SendRequest(
+		resty.MethodPost,
+		issuesCountURL,
+		req,
+		&respBody,
+	)
+	if err != nil {
+		return 0, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return 0, fmt.Errorf("Request failed with status code: %s. Body: %s", res.Status(), body)
+	}
+	return int(respBody), nil
 }
