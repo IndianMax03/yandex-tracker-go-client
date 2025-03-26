@@ -78,7 +78,7 @@ func (c *Client) CreateIssue(req *IssueCreateRequest) (*IssueCreateResponse, err
 	}
 	if res.IsError() {
 		body, _ := io.ReadAll(res.Body)
-		return nil, fmt.Errorf("Request failed with status code: %s. Body: %s", res.Status(), body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
 	}
 	return &respBody, nil
 }
@@ -97,7 +97,7 @@ func (c *Client) GetIssuesCount(req *IssueCountRequest) (int, error) {
 	}
 	if res.IsError() {
 		body, _ := io.ReadAll(res.Body)
-		return 0, fmt.Errorf("Request failed with status code: %s. Body: %s", res.Status(), body)
+		return 0, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
 	}
 	return int(respBody), nil
 }
