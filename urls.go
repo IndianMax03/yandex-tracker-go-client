@@ -4,3 +4,4 @@ package client
 var issuesBaseURL = "/issues/"
 var issuesCreateURL = issuesBaseURL
 var issuesCountURL = issuesBaseURL + "_count"
+var issuesSearchURL = issuesBaseURL + "_search"
