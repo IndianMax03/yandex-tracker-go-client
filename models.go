@@ -131,7 +131,7 @@ type IssueSearchResponse []struct {
 	// Editing the issue will be blocked if the version reaches the maximum value: for robots 10100, for users 11100.
 	Version int `json:"version"`
 	// Date and time of the last comment added.
-	//LastCommentUpdatedAt string `json:"lastCommentUpdatedAt"`
+	LastCommentUpdatedAt string `json:"lastCommentUpdatedAt"`
 	// Issue name.
 	Summary string `json:"summary"`
 	// No info: https://yandex.ru/support/tracker/ru/concepts/issues/search-issues
@@ -139,13 +139,13 @@ type IssueSearchResponse []struct {
 	// No info: https://yandex.ru/support/tracker/ru/concepts/issues/search-issues
 	StatusStartTime string `json:"statusStartTime"`
 	// An object with information about the parent issue.
-	// Parent IssueParent `json:"parent"`
+	Parent IssueParent `json:"parent"`
 	// An object containing information about the last employee who modified the issue.
 	UpdatedBy IssueUpdatedBy `json:"updatedBy"`
 	// Description of the issue.
-	// Description string `json:"description"`
+	Description string `json:"description"`
 	// An array of objects containing information about the sprint.
-	// Sprint IssueSprint `json:"sprint"`
+	Sprint IssueSprint `json:"sprint"`
 	// An object with information about the issue type.
 	Type IssueType `json:"type"`
 	// Object with priority information.
@@ -153,11 +153,11 @@ type IssueSearchResponse []struct {
 	// Date and time the issue was created.
 	CreatedAt string `json:"createdAt"`
 	// An array of objects containing information about the issue's observers.
-	// Followers IssueFollowers `json:"followers"`
+	Followers IssueFollowers `json:"followers"`
 	// An object containing information about the issue creator.
 	CreatedBy IssueCreatedBy `json:"createdBy"`
 	// An object with information about the issue performer.
-	// Assignee IssueAssignee `json:"assignee"`
+	Assignee IssueAssignee `json:"assignee"`
 	// Number of votes for the issue.
 	Votes int `json:"votes"`
 	// Number of comments with external message
