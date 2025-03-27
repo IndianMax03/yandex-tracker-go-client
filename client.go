@@ -1,4 +1,5 @@
 // The client package provides methods, values and models for interacting with Yandex Tracker
+// The client package provides methods, values and models for interacting with Yandex Tracker
 package client
 
 import (
