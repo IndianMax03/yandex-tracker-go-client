@@ -11,44 +11,49 @@ type Board struct {
 	Name string `json:"name"`
 }
 
-type ObjectBase struct {
+type ObjectBaseRequest struct {
+	ID  string `json:"id"`
+	Key string `json:"key"`
+}
+
+type ObjectBaseResponse struct {
 	Self    string `json:"self"`
 	ID      string `json:"id"`
 	Display string `json:"display"`
 }
 
 type IssueParent struct {
-	ObjectBase
+	ObjectBaseResponse
 	Key string `json:"key"`
 }
 
-type IssueUpdatedBy ObjectBase
+type IssueUpdatedBy ObjectBaseResponse
 
-type IssueSprint []ObjectBase
+type IssueSprint []ObjectBaseResponse
 
 type IssueType struct {
-	ObjectBase
+	ObjectBaseResponse
 	Key string `json:"key"`
 }
 
 type IssuePriority struct {
-	ObjectBase
+	ObjectBaseResponse
 	Key string `json:"key"`
 }
 
-type IssueFollowers []ObjectBase
+type IssueFollowers []ObjectBaseResponse
 
-type IssueCreatedBy ObjectBase
+type IssueCreatedBy ObjectBaseResponse
 
-type IssueAssignee ObjectBase
+type IssueAssignee ObjectBaseResponse
 
 type IssueQueue struct {
-	ObjectBase
+	ObjectBaseResponse
 	Key string `json:"key"`
 }
 
 type IssueStatus struct {
-	ObjectBase
+	ObjectBaseResponse
 	Key string `json:"key"`
 }
 
@@ -59,6 +64,6 @@ type IssueStatusType struct {
 }
 
 type IssuePreviousStatus struct {
-	ObjectBase
+	ObjectBaseResponse
 	Key string `json:"key"`
 }

@@ -23,7 +23,7 @@ type IssueSearchRequest struct {
 }
 
 // An array of objects containing information about issues
-type IssueSearchResponse []struct {
+type IssueResponse struct {
 	// The address of the API resource that contains information about the issue.
 	Self string `json:"self"`
 	// Issue ID.

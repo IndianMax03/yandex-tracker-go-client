@@ -5,3 +5,4 @@ var issuesBaseURL = "/issues/"
 var issuesCreateURL = issuesBaseURL
 var issuesCountURL = issuesBaseURL + "_count"
 var issuesSearchURL = issuesBaseURL + "_search"
+var issuesModifyURL = issuesBaseURL + "{issue_id}"
