@@ -1,7 +1,7 @@
 // Package model contains an entities for exchanging information with the Yandex Tracker API
 package model
 
-// IssueCreateRequestRequest describes request to create a new issue
+// IssueCreateRequest describes request to create a new issue
 type IssueCreateRequest struct {
 	// Mandatory
 

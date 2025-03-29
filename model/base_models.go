@@ -7,7 +7,7 @@ type Queue struct {
 	Key string `json:"key"`
 }
 
-// No info: https://yandex.ru/support/tracker/ru/concepts/issues/search-issues
+// Board has no info: https://yandex.ru/support/tracker/ru/concepts/issues/search-issues
 type Board struct {
 	ID   any    `json:"id"`
 	Name string `json:"name"`
@@ -19,7 +19,7 @@ type ObjectBaseRequest struct {
 	Key string `json:"key"`
 }
 
-// ObjectBaseRequest describes the basic structure of a request object
+// ObjectBaseResponse describes the basic structure of a request object
 type ObjectBaseResponse struct {
 	Self    string `json:"self"`
 	ID      string `json:"id"`
@@ -53,7 +53,7 @@ type IssuePriority struct {
 // IssueFollowers describes issue followers
 type IssueFollowers []ObjectBaseResponse
 
-// IssueParent describes the user who created the issue
+// IssueCreatedBy describes the user who created the issue
 type IssueCreatedBy ObjectBaseResponse
 
 // IssueAssignee describes user who is the issue performer
@@ -71,14 +71,14 @@ type IssueStatus struct {
 	Key string `json:"key"`
 }
 
-// IssueStatus describes the issue status type
+// IssueStatusType describes the issue status type
 type IssueStatusType struct {
 	ID      string `json:"id"`
 	Display string `json:"display"`
 	Key     string `json:"key"`
 }
 
-// IssueStatus describes previous issue status
+// IssuePreviousStatus describes previous issue status
 type IssuePreviousStatus struct {
 	ObjectBaseResponse
 	Key string `json:"key"`

@@ -32,14 +32,14 @@ func newTransition() (req *IssueModifyStatusRequest) {
 	return
 }
 
-// New transition to open
+// NewReopenTransition instantiates transition to open
 func NewReopenTransition() (req *IssueModifyStatusRequest, transitionID string) {
 	req = newTransition()
 	transitionID = ReopenTransitionID
 	return
 }
 
-// New transition to in progress
+// NewInProgressTransition instantiates transition to in progress
 func NewInProgressTransition(assignee string) (req *IssueModifyStatusRequest, transitionID string) {
 	req = newTransition()
 	req.Assignee = assignee
@@ -47,14 +47,14 @@ func NewInProgressTransition(assignee string) (req *IssueModifyStatusRequest, tr
 	return
 }
 
-// New transition to stop progress
+// NewStopProgressTransition instantiates transition to stop progress
 func NewStopProgressTransition() (req *IssueModifyStatusRequest, transitionID string) {
 	req = newTransition()
 	transitionID = StopProgressTransitionID
 	return
 }
 
-// New transition to need info
+// NewNeedInfoTransition instantiates transition to need info
 func NewNeedInfoTransition(assignee string) (req *IssueModifyStatusRequest, transitionID string) {
 	req = newTransition()
 	req.Assignee = assignee
@@ -62,7 +62,7 @@ func NewNeedInfoTransition(assignee string) (req *IssueModifyStatusRequest, tran
 	return
 }
 
-// New transition to provide info
+// NewProvideInfoTransition instantiates transition to provide info
 func NewProvideInfoTransition(assignee string) (req *IssueModifyStatusRequest, transitionID string) {
 	req = newTransition()
 	req.Assignee = assignee
@@ -70,7 +70,7 @@ func NewProvideInfoTransition(assignee string) (req *IssueModifyStatusRequest, t
 	return
 }
 
-// New transition to close (fixed)
+// NewCloseFixedTransition instantiates transition to close (fixed)
 func NewCloseFixedTransition() (req *IssueModifyStatusRequest, transitionID string) {
 	req = newTransition()
 	req.Resolution = Fixed
@@ -78,7 +78,7 @@ func NewCloseFixedTransition() (req *IssueModifyStatusRequest, transitionID stri
 	return
 }
 
-// New transition to close (Won't fix)
+// NewCloseWontFixTransition instantiates transition to close (Won't fix)
 func NewCloseWontFixTransition() (req *IssueModifyStatusRequest, transitionID string) {
 	req = newTransition()
 	req.Resolution = WontFix
