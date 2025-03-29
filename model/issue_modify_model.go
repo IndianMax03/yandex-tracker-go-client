@@ -1,6 +1,7 @@
-// The model package contains an entities for exchanging information with the Yandex Tracker API
+// Model package contains an entities for exchanging information with the Yandex Tracker API
 package model
 
+// IssueModifyRequest describes request to modify existing issue
 type IssueModifyRequest struct {
 	Summary                  string              `json:"summary,omitempty"`
 	Parent                   ObjectBaseRequest   `json:"parent,omitzero"`
@@ -15,11 +16,13 @@ type IssueModifyRequest struct {
 	Tags                     []string            `json:"tags,omitempty"`
 }
 
+// ModifyFollowers describes request object to modify followers of existing issue
 type ModifyFollowers struct {
 	Add    []string `json:"add,omitempty"`
 	Remove []string `json:"remove,omitempty"`
 }
 
+// SprintModifyRequest describes sprint object to modify sprints of existing issue
 type SprintModifyRequest struct {
 	ID string `json:"id"`
 }

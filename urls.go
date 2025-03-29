@@ -1,4 +1,4 @@
-// The client package provides methods, values and urls for interacting with Yandex Tracker
+// Package client provides methods, values and urls for interacting with Yandex Tracker
 package client
 
 var issuesBaseURL = "/issues/"

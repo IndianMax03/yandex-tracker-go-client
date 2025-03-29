@@ -1,7 +1,7 @@
-// The model package contains an entities for exchanging information with the Yandex Tracker API
+// Model package contains an entities for exchanging information with the Yandex Tracker API
 package model
 
-// Request to get filtered and sorted issues. The request does not imply a combination of parameters.
+// IssueSearchRequest describes request to get filtered and sorted issues. The request does not imply a combination of parameters.
 // According to priority:
 // 1. queue;
 // 2. keys;
@@ -22,7 +22,7 @@ type IssueSearchRequest struct {
 	Query string `json:"query,omitempty"`
 }
 
-// An array of objects containing information about issues
+// IssueResponse describes response contains array of objects that containing information about issues
 type IssueResponse struct {
 	// The address of the API resource that contains information about the issue.
 	Self string `json:"self"`

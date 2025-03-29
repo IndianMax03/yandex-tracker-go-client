@@ -1,4 +1,4 @@
-// The model package contains an entities for exchanging information with the Yandex Tracker API
+// Model package contains an entities for exchanging information with the Yandex Tracker API
 package model
 
 type Queue struct {

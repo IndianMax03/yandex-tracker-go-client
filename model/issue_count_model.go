@@ -1,7 +1,7 @@
-// The model package contains an entities for exchanging information with the Yandex Tracker API
+// Model package contains an entities for exchanging information with the Yandex Tracker API
 package model
 
-// Request to get the number of issues
+// IssueCountRequest describes request to get the number of issues
 type IssueCountRequest struct {
 	// Issue filtering parameters.
 	// In the parameter, you can specify the name of any field and the value by which filtering will be performed.
@@ -10,5 +10,5 @@ type IssueCountRequest struct {
 	Query string `json:"query"`
 }
 
-// Number of issues
+// IssueCountResponse describes response countains number of issues
 type IssueCountResponse int

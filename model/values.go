@@ -1,4 +1,4 @@
-// The model package contains an entities for exchanging information with the Yandex Tracker API
+// Model package contains an entities for exchanging information with the Yandex Tracker API
 package model
 
 import (
@@ -34,6 +34,7 @@ const (
 	ReopenTransitionID       = "reopen"
 )
 
+// Get priority id & key by priority value
 func GetPriority(priority int) (*ObjectBaseRequest, error) {
 	priorityName := ""
 	if priority == TrivialPriority {

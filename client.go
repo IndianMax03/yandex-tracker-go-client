@@ -1,4 +1,4 @@
-// The client package provides methods, values and urls for interacting with Yandex Tracker
+// Package client provides methods, values and urls for interacting with Yandex Tracker
 package client
 
 import (
@@ -22,7 +22,7 @@ type Client struct {
 	restyClient *resty.Client
 }
 
-// Create a new Client
+// New Yandex Tracker Client
 func New(tokenOAuth, xCloudOrgID, xOrgID, acceptLanguage string) *Client {
 	var lang string
 	headers := map[string]string{}
@@ -49,7 +49,7 @@ func New(tokenOAuth, xCloudOrgID, xOrgID, acceptLanguage string) *Client {
 	}
 }
 
-// Send request to Yandex Tracker
+// SendRequest sends request to Yandex Tracker
 func (c *Client) SendRequest(method, resourceURL string, queryParams map[string]string, pathParams map[string]string, requestBody, responseBody any) (resp *resty.Response, err error) {
 	req := c.restyClient.R().
 		SetContentType(defaultContentType).
@@ -63,12 +63,12 @@ func (c *Client) SendRequest(method, resourceURL string, queryParams map[string]
 	return
 }
 
-// Allow logging of details of each request and response.
+// SetDebug allows logging of details of each request and response.
 func (c *Client) SetDebug(debug bool) {
 	c.restyClient.SetDebug(debug)
 }
 
-// Create a new issue
+// CreateIssue sends request to create new issue in Yandex Tracker
 func (c *Client) CreateIssue(req *model.IssueCreateRequest) (*model.IssueResponse, error) {
 	var respBody model.IssueResponse
 	res, err := c.SendRequest(
@@ -89,7 +89,7 @@ func (c *Client) CreateIssue(req *model.IssueCreateRequest) (*model.IssueRespons
 	return &respBody, nil
 }
 
-// Get the number of issues
+// GetIssuesCount sends a request to get the number of tasks
 func (c *Client) GetIssuesCount(req *model.IssueCountRequest) (int, error) {
 	var respBody model.IssueCountResponse
 	res, err := c.SendRequest(
@@ -110,7 +110,7 @@ func (c *Client) GetIssuesCount(req *model.IssueCountRequest) (int, error) {
 	return int(respBody), nil
 }
 
-// Find issues using pagination
+// SearchIssuesPage sends a request to find issues using pagination
 func (c *Client) SearchIssuesPage(req *model.IssueSearchRequest, pageReq *model.PageRequest) ([]model.IssueResponse, *model.PageResponse, error) {
 	if pageReq.PerPage <= 0 {
 		pageReq.PerPage = 5
@@ -148,28 +148,29 @@ func (c *Client) SearchIssuesPage(req *model.IssueSearchRequest, pageReq *model.
 	return respBody, &pageResp, nil
 }
 
-// Find all issues
+// SearchAllIssues sends a request to find all issues
 func (c *Client) SearchAllIssues(req *model.IssueSearchRequest) ([]model.IssueResponse, error) {
 	currentPage := 1
 	pageReq := model.PageRequest{
 		Page:    currentPage,
 		PerPage: 50,
 	}
-
-	if result, pag, err := c.SearchIssuesPage(req, &pageReq); err != nil {
+	
+	result, pag, err := c.SearchIssuesPage(req, &pageReq)
+	if err != nil {
 		return nil, err
-	} else {
-		totalPages := pag.TotalPages
-		for currentPage < totalPages {
-			currentPage += 1
-			pageReq.Page = currentPage
-			resp, _, _ := c.SearchIssuesPage(req, &pageReq)
-			result = append(result, resp...)
-		}
-		return result, nil
 	}
+	totalPages := pag.TotalPages
+	for currentPage < totalPages {
+		currentPage++
+		pageReq.Page = currentPage
+		resp, _, _ := c.SearchIssuesPage(req, &pageReq)
+		result = append(result, resp...)
+	}
+	return result, nil
 }
 
+// ModifyIssue sends a request to modify existing issue
 func (c *Client) ModifyIssue(issueId string, req *model.IssueModifyRequest) (*model.IssueResponse, error) {
 	pathParams := make(map[string]string)
 	pathParams["issue_id"] = issueId
@@ -192,6 +193,7 @@ func (c *Client) ModifyIssue(issueId string, req *model.IssueModifyRequest) (*mo
 	return &respBody, nil
 }
 
+// ModifyIssueStatus sends a request to modify existing issue status
 func (c *Client) ModifyIssueStatus(issueId string, transitionID string, req *model.IssueModifyStatusRequest) ([]model.IssueModifyStatusResponse, error) {
 	pathParams := make(map[string]string)
 	pathParams["issue_id"] = issueId
