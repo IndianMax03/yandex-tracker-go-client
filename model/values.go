@@ -6,6 +6,7 @@ import (
 	"strconv"
 )
 
+// Issue priority
 const (
 	TrivialPriority = iota + 1
 	MinorPriority
@@ -14,6 +15,7 @@ const (
 	BlockerPriority
 )
 
+// Issue resolution
 const (
 	Fixed         = "fixed"
 	WontFix       = "wontFix"
@@ -25,6 +27,7 @@ const (
 	DontDo        = "dontDo"
 )
 
+// Issue Transition IDs
 const (
 	InProgrssTransitionID    = "start_progress"
 	StopProgressTransitionID = "stop_progress"
@@ -34,7 +37,7 @@ const (
 	ReopenTransitionID       = "reopen"
 )
 
-// Get priority id & key by priority value
+// GetPriority maps priority value to priority id & key
 func GetPriority(priority int) (*ObjectBaseRequest, error) {
 	priorityName := ""
 	if priority == TrivialPriority {
