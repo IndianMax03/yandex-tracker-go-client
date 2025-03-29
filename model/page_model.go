@@ -1,14 +1,18 @@
-// Model package contains an entities for exchanging information with the Yandex Tracker API
+// Package model contains an entities for exchanging information with the Yandex Tracker API
 package model
 
 // PageRequest describes pagination request headers
 type PageRequest struct {
+	// Objects per page
 	PerPage int
-	Page    int
+	// Page number
+	Page int
 }
 
 // PageResponse describes pagination response headers
 type PageResponse struct {
+	// Total number of pages
 	TotalPages int
+	// Total number of objects
 	TotalCount int
 }

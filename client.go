@@ -155,7 +155,7 @@ func (c *Client) SearchAllIssues(req *model.IssueSearchRequest) ([]model.IssueRe
 		Page:    currentPage,
 		PerPage: 50,
 	}
-	
+
 	result, pag, err := c.SearchIssuesPage(req, &pageReq)
 	if err != nil {
 		return nil, err
@@ -171,9 +171,9 @@ func (c *Client) SearchAllIssues(req *model.IssueSearchRequest) ([]model.IssueRe
 }
 
 // ModifyIssue sends a request to modify existing issue
-func (c *Client) ModifyIssue(issueId string, req *model.IssueModifyRequest) (*model.IssueResponse, error) {
+func (c *Client) ModifyIssue(issueID string, req *model.IssueModifyRequest) (*model.IssueResponse, error) {
 	pathParams := make(map[string]string)
-	pathParams["issue_id"] = issueId
+	pathParams["issue_id"] = issueID
 	var respBody model.IssueResponse
 	res, err := c.SendRequest(
 		resty.MethodPatch,
@@ -194,9 +194,9 @@ func (c *Client) ModifyIssue(issueId string, req *model.IssueModifyRequest) (*mo
 }
 
 // ModifyIssueStatus sends a request to modify existing issue status
-func (c *Client) ModifyIssueStatus(issueId string, transitionID string, req *model.IssueModifyStatusRequest) ([]model.IssueModifyStatusResponse, error) {
+func (c *Client) ModifyIssueStatus(issueID string, transitionID string, req *model.IssueModifyStatusRequest) ([]model.IssueModifyStatusResponse, error) {
 	pathParams := make(map[string]string)
-	pathParams["issue_id"] = issueId
+	pathParams["issue_id"] = issueID
 	pathParams["transition_id"] = transitionID
 	var respBody []model.IssueModifyStatusResponse
 	res, err := c.SendRequest(

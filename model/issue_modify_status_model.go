@@ -1,20 +1,27 @@
-// Model package contains an entities for exchanging information with the Yandex Tracker API
+// Package model contains an entities for exchanging information with the Yandex Tracker API
 package model
 
 // IssueModifyStatusRequest describes request to modify issue status
 type IssueModifyStatusRequest struct {
+	// Issue  resolution
 	Resolution string `json:"resolution,omitempty"`
-	Assignee   string `json:"assignee,omitempty"`
-	Comment    string `json:"comment,omitempty"`
+	// Issue field available for modification during transition. List of keys: https://tracker.yandex.ru/admin/fields
+	Assignee string `json:"assignee,omitempty"`
+	// Commentary on the issue.
+	Comment string `json:"comment,omitempty"`
 }
 
 // IssueModifyStatusResponse describes response of issue status modify contains next allowed issue transitions
 type IssueModifyStatusResponse struct {
-	Self         string         `json:"self"`
-	TransitionID string         `json:"id"`
-	To           NextTransition `json:"to"`
+	// The address of the API resource that contains the transition information.
+	Self string `json:"self"`
+	// Transition identifier.
+	TransitionID string `json:"id"`
+	// A block with status information to which a issue can be transferred.
+	To NextTransition `json:"to"`
 }
 
+// NextTransition describes next possible issue transitions.
 type NextTransition struct {
 	ObjectBaseResponse
 	Key string `json:"key"`

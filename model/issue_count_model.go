@@ -1,4 +1,4 @@
-// Model package contains an entities for exchanging information with the Yandex Tracker API
+// Package model contains an entities for exchanging information with the Yandex Tracker API
 package model
 
 // IssueCountRequest describes request to get the number of issues

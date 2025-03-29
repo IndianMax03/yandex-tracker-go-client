@@ -1,4 +1,4 @@
-// Model package contains an entities for exchanging information with the Yandex Tracker API
+// Package model contains an entities for exchanging information with the Yandex Tracker API
 package model
 
 // IssueSearchRequest describes request to get filtered and sorted issues. The request does not imply a combination of parameters.
