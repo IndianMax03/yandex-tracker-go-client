@@ -1,5 +1,4 @@
-// The client package provides methods, values and models for interacting with Yandex Tracker
-// The client package provides methods, values and models for interacting with Yandex Tracker
+// The client package provides methods, values and urls for interacting with Yandex Tracker
 package client
 
 import (
@@ -8,6 +7,7 @@ import (
 	"strconv"
 
 	"resty.dev/v3"
+	model "github.com/IndianMax03/yandex-tracker-go-client/model"
 )
 
 const (
@@ -68,8 +68,8 @@ func (c *Client) SetDebug(debug bool) {
 }
 
 // Create a new issue
-func (c *Client) CreateIssue(req *IssueCreateRequest) (*IssueCreateResponse, error) {
-	var respBody IssueCreateResponse
+func (c *Client) CreateIssue(req *model.IssueCreateRequest) (*model.IssueCreateResponse, error) {
+	var respBody model.IssueCreateResponse
 	res, err := c.SendRequest(
 		resty.MethodPost,
 		issuesCreateURL,
@@ -88,8 +88,8 @@ func (c *Client) CreateIssue(req *IssueCreateRequest) (*IssueCreateResponse, err
 }
 
 // Get the number of issues
-func (c *Client) GetIssuesCount(req *IssueCountRequest) (int, error) {
-	var respBody IssueCountResponse
+func (c *Client) GetIssuesCount(req *model.IssueCountRequest) (int, error) {
+	var respBody model.IssueCountResponse
 	res, err := c.SendRequest(
 		resty.MethodPost,
 		issuesCountURL,
@@ -108,7 +108,7 @@ func (c *Client) GetIssuesCount(req *IssueCountRequest) (int, error) {
 }
 
 // Find issues using pagination
-func (c *Client) SearchIssuesPage(req *IssueSearchRequest, pageReq *PageRequest) (*IssueSearchResponse, *PageResponse, error) {
+func (c *Client) SearchIssuesPage(req *model.IssueSearchRequest, pageReq *model.PageRequest) (*model.IssueSearchResponse, *model.PageResponse, error) {
 	if pageReq.PerPage <= 0 {
 		pageReq.PerPage = 5
 	}
@@ -119,7 +119,7 @@ func (c *Client) SearchIssuesPage(req *IssueSearchRequest, pageReq *PageRequest)
 	queryParams["perPage"] = strconv.Itoa(pageReq.PerPage)
 	queryParams["page"] = strconv.Itoa(pageReq.Page)
 
-	var respBody IssueSearchResponse
+	var respBody model.IssueSearchResponse
 	res, err := c.SendRequest(
 		resty.MethodPost,
 		issuesSearchURL,
@@ -137,7 +137,7 @@ func (c *Client) SearchIssuesPage(req *IssueSearchRequest, pageReq *PageRequest)
 
 	totalPages, _ := strconv.Atoi(res.Header().Get("X-Total-Pages"))
 	totalCount, _ := strconv.Atoi(res.Header().Get("X-Total-Count"))
-	pageResp := PageResponse{
+	pageResp := model.PageResponse{
 		TotalPages: totalPages,
 		TotalCount: totalCount,
 	}
@@ -145,9 +145,9 @@ func (c *Client) SearchIssuesPage(req *IssueSearchRequest, pageReq *PageRequest)
 }
 
 // Find all issues
-func (c *Client) SearchAllIssues(req *IssueSearchRequest) (*IssueSearchResponse, error) {
+func (c *Client) SearchAllIssues(req *model.IssueSearchRequest) (*model.IssueSearchResponse, error) {
 	currentPage := 1
-	pageReq := PageRequest{
+	pageReq := model.PageRequest{
 		Page:    currentPage,
 		PerPage: 50,
 	}
