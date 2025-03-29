@@ -112,11 +112,25 @@ type IssueCountRequest struct {
 // Number of issues
 type IssueCountResponse int
 
-// Request to get filtered and sorted tasks
+// Request to get filtered and sorted issues. The request does not imply a combination of parameters.
+// According to priority:
+// 1. queue;
+// 2. keys;
+// 3. filter + order;
+// 4. query.
 type IssueSearchRequest struct {
+	// Queue.
+	Queue string `json:"queue,omitempty"`
+	// List of task keys.
+	Keys []string `json:"keys,omitempty"`
+	// Issue filtering parameters.
+	// In the parameter, you can specify the name of any field and the value by which filtering will be performed.
 	Filter map[string]any `json:"filter,omitempty"`
-	Order  string         `json:"order,omitempty"`
-	Query  string         `json:"query,omitempty"`
+	// The direction and field of issue sorting (only in combination with the Filter parameter).
+	// The value is specified in the format [+/-]<field_key>. The + or - sign indicates the sorting direction.
+	Order string `json:"order,omitempty"`
+	// Filter in query language.
+	Query string `json:"query,omitempty"`
 }
 
 // An array of objects containing information about issues
