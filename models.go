@@ -58,7 +58,7 @@ type IssueCreateResponse struct {
 	LastCommentUpdatedAt string `json:"lastCommentUpdatedAt"`
 	// Issue name.
 	Summary string `json:"summary"`
-
+	// No info: https://yandex.ru/support/tracker/ru/concepts/issues/create-issue
 	StatusStartTime string `json:"statusStartTime"`
 	// An object with information about the parent issue.
 	Parent IssueParent `json:"parent"`
