@@ -29,7 +29,7 @@ func GetPriority(priority int) (*model.ObjectBaseRequest, error) {
 	} else if priority == BlockerPriority {
 		priorityName = "blocker"
 	} else {
-		return nil, fmt.Errorf("Unknown priority: %v", priority)
+		return nil, fmt.Errorf("unknown priority: %v", priority)
 	}
 	return &model.ObjectBaseRequest{
 		ID:  strconv.Itoa(priority),
