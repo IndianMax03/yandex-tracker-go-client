@@ -1,5 +1,4 @@
-// The client package provides methods, values and models for interacting with Yandex Tracker
-// The client package provides methods, values and models for interacting with Yandex Tracker
+// The client package provides methods, values and urls for interacting with Yandex Tracker
 package client
 
 import (
@@ -7,6 +6,7 @@ import (
 	"io"
 	"strconv"
 
+	model "github.com/IndianMax03/yandex-tracker-go-client/model"
 	"resty.dev/v3"
 )
 
@@ -50,14 +50,15 @@ func New(tokenOAuth, xCloudOrgID, xOrgID, acceptLanguage string) *Client {
 }
 
 // Send request to Yandex Tracker
-func (c *Client) SendRequest(method, resourceURL string, queryParams map[string]string, requestBody, responseBody any) (resp *resty.Response, err error) {
+func (c *Client) SendRequest(method, resourceURL string, queryParams map[string]string, pathParams map[string]string, requestBody, responseBody any) (resp *resty.Response, err error) {
 	req := c.restyClient.R().
 		SetContentType(defaultContentType).
 		SetMethod(method).
 		SetBody(requestBody).
 		SetResult(responseBody).
 		SetURL(c.restyClient.BaseURL() + resourceURL).
-		SetQueryParams(queryParams)
+		SetQueryParams(queryParams).
+		SetPathParams(pathParams)
 	resp, err = req.Send()
 	return
 }
@@ -68,11 +69,12 @@ func (c *Client) SetDebug(debug bool) {
 }
 
 // Create a new issue
-func (c *Client) CreateIssue(req *IssueCreateRequest) (*IssueCreateResponse, error) {
-	var respBody IssueCreateResponse
+func (c *Client) CreateIssue(req *model.IssueCreateRequest) (*model.IssueResponse, error) {
+	var respBody model.IssueResponse
 	res, err := c.SendRequest(
 		resty.MethodPost,
 		issuesCreateURL,
+		nil,
 		nil,
 		req,
 		&respBody,
@@ -88,11 +90,12 @@ func (c *Client) CreateIssue(req *IssueCreateRequest) (*IssueCreateResponse, err
 }
 
 // Get the number of issues
-func (c *Client) GetIssuesCount(req *IssueCountRequest) (int, error) {
-	var respBody IssueCountResponse
+func (c *Client) GetIssuesCount(req *model.IssueCountRequest) (int, error) {
+	var respBody model.IssueCountResponse
 	res, err := c.SendRequest(
 		resty.MethodPost,
 		issuesCountURL,
+		nil,
 		nil,
 		req,
 		&respBody,
@@ -108,7 +111,7 @@ func (c *Client) GetIssuesCount(req *IssueCountRequest) (int, error) {
 }
 
 // Find issues using pagination
-func (c *Client) SearchIssuesPage(req *IssueSearchRequest, pageReq *PageRequest) (*IssueSearchResponse, *PageResponse, error) {
+func (c *Client) SearchIssuesPage(req *model.IssueSearchRequest, pageReq *model.PageRequest) ([]model.IssueResponse, *model.PageResponse, error) {
 	if pageReq.PerPage <= 0 {
 		pageReq.PerPage = 5
 	}
@@ -119,11 +122,12 @@ func (c *Client) SearchIssuesPage(req *IssueSearchRequest, pageReq *PageRequest)
 	queryParams["perPage"] = strconv.Itoa(pageReq.PerPage)
 	queryParams["page"] = strconv.Itoa(pageReq.Page)
 
-	var respBody IssueSearchResponse
+	var respBody []model.IssueResponse
 	res, err := c.SendRequest(
 		resty.MethodPost,
 		issuesSearchURL,
 		queryParams,
+		nil,
 		req,
 		&respBody,
 	)
@@ -137,17 +141,17 @@ func (c *Client) SearchIssuesPage(req *IssueSearchRequest, pageReq *PageRequest)
 
 	totalPages, _ := strconv.Atoi(res.Header().Get("X-Total-Pages"))
 	totalCount, _ := strconv.Atoi(res.Header().Get("X-Total-Count"))
-	pageResp := PageResponse{
+	pageResp := model.PageResponse{
 		TotalPages: totalPages,
 		TotalCount: totalCount,
 	}
-	return &respBody, &pageResp, nil
+	return respBody, &pageResp, nil
 }
 
 // Find all issues
-func (c *Client) SearchAllIssues(req *IssueSearchRequest) (*IssueSearchResponse, error) {
+func (c *Client) SearchAllIssues(req *model.IssueSearchRequest) ([]model.IssueResponse, error) {
 	currentPage := 1
-	pageReq := PageRequest{
+	pageReq := model.PageRequest{
 		Page:    currentPage,
 		PerPage: 50,
 	}
@@ -160,8 +164,30 @@ func (c *Client) SearchAllIssues(req *IssueSearchRequest) (*IssueSearchResponse,
 			currentPage += 1
 			pageReq.Page = currentPage
 			resp, _, _ := c.SearchIssuesPage(req, &pageReq)
-			*result = append(*result, *resp...)
+			result = append(result, resp...)
 		}
 		return result, nil
 	}
+}
+
+func (c *Client) ModifyIssue(issueId string, req *model.IssueModifyRequest) (*model.IssueResponse, error) {
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueId
+	var respBody model.IssueResponse
+	res, err := c.SendRequest(
+		resty.MethodPatch,
+		issuesModifyURL,
+		nil,
+		pathParams,
+		req,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return &respBody, nil
 }
