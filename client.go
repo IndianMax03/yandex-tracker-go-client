@@ -191,3 +191,26 @@ func (c *Client) ModifyIssue(issueId string, req *model.IssueModifyRequest) (*mo
 	}
 	return &respBody, nil
 }
+
+func (c *Client) ModifyIssueStatus(issueId string, transitionID string, req *model.IssueModifyStatusRequest) ([]model.IssueModifyStatusResponse, error) {
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueId
+	pathParams["transition_id"] = transitionID
+	var respBody []model.IssueModifyStatusResponse
+	res, err := c.SendRequest(
+		resty.MethodPost,
+		issuesModifyStatusURL,
+		nil,
+		pathParams,
+		req,
+		respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return respBody, nil
+}
