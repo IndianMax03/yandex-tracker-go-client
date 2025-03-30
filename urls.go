@@ -7,6 +7,7 @@ var issuesCountURL = issuesBaseURL + "_count"
 var issuesSearchURL = issuesBaseURL + "_search"
 var issuesModifyURL = issuesBaseURL + "{issue_id}"
 var issuesGetURL = issuesBaseURL + "{issue_id}"
+var issueGetTransitionsURL = issuesBaseURL + "{issue_id}/transitions"
 var issuesModifyStatusURL = issuesBaseURL + "{issue_id}/transitions/{transition_id}/_execute"
 
 var prioritiesBaseURL = "/priorities/"

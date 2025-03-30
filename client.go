@@ -258,7 +258,31 @@ func (c *Client) ModifyIssueStatus(issueID string, transitionID string, req *mod
 		nil,
 		pathParams,
 		req,
-		respBody,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return respBody, nil
+}
+
+// GetIssueTransitions sends a request to find all possible issue transitions
+func (c *Client) GetIssueTransitions(issueID string) ([]model.IssueTransitionsResponse, error) {
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueID
+	var respBody []model.IssueTransitionsResponse
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		issueGetTransitionsURL,
+		nil,
+		nil,
+		pathParams,
+		nil,
+		&respBody,
 	)
 	if err != nil {
 		return nil, err
