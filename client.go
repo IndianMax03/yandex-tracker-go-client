@@ -101,6 +101,7 @@ func (c *Client) CreateIssue(req *model.IssueCreateRequest) (*model.IssueRespons
 	return &respBody, nil
 }
 
+// GetIssue sends request to find concrete issue by ID
 func (c *Client) GetIssue(issueID string, includeAttachments, includeTransitions bool) (*model.IssueResponse, error) {
 	var respBody model.IssueResponse
 	pathParams := make(map[string]string)
@@ -269,6 +270,7 @@ func (c *Client) ModifyIssueStatus(issueID string, transitionID string, req *mod
 	return respBody, nil
 }
 
+// GetPrioritiesPage sends a request to find priorities using pagination
 func (c *Client) GetPrioritiesPage(localized bool, pageReq *model.PageRequest) ([]model.PriorityResponse, *model.PageResponse, error) {
 	if pageReq.PerPage <= 0 {
 		pageReq.PerPage = 5
@@ -308,6 +310,7 @@ func (c *Client) GetPrioritiesPage(localized bool, pageReq *model.PageRequest) (
 	return respBody, &pageResp, nil
 }
 
+// GetAllPriorities sends a request to find all priorities
 func (c *Client) GetAllPriorities(localized bool) ([]model.PriorityResponse, error) {
 	currentPage := 1
 	pageReq := model.PageRequest{
@@ -329,6 +332,7 @@ func (c *Client) GetAllPriorities(localized bool) ([]model.PriorityResponse, err
 	return result, nil
 }
 
+// GetPriority sends a request to find concrete priority
 func (c *Client) GetPriority(priorityID int, localized bool) (*model.PriorityResponse, error) {
 	queryParams := make(map[string]string)
 	queryParams["localized"] = strconv.FormatBool(localized)
