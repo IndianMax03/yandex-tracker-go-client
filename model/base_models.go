@@ -32,8 +32,8 @@ type IssueParent struct {
 	Key string `json:"key"`
 }
 
-// IssueUpdatedBy describes the user who updated the issue last
-type IssueUpdatedBy ObjectBaseResponse
+// UpdatedBy describes the user who updated the entity last
+type UpdatedBy ObjectBaseResponse
 
 // IssueSprint describes issue sprint
 type IssueSprint []ObjectBaseResponse
@@ -53,8 +53,8 @@ type IssuePriority struct {
 // IssueFollowers describes issue followers
 type IssueFollowers []ObjectBaseResponse
 
-// IssueCreatedBy describes the user who created the issue
-type IssueCreatedBy ObjectBaseResponse
+// CreatedBy describes the user who created the entity
+type CreatedBy ObjectBaseResponse
 
 // IssueAssignee describes user who is the issue performer
 type IssueAssignee ObjectBaseResponse

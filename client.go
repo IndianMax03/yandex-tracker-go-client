@@ -383,3 +383,27 @@ func (c *Client) GetPriority(priorityID int, localized bool) (*model.PriorityRes
 	}
 	return &respBody, nil
 }
+
+// CreateComment sends a request to add a comment to a issue
+func (c *Client) CreateComment(issueID string, req *model.CommentRequest) (*model.CommentResponse, error) {
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueID
+	var respBody model.CommentResponse
+	res, err := c.SendRequest(
+		resty.MethodPost,
+		issueAppendCommentURL,
+		nil,
+		nil,
+		pathParams,
+		req,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return &respBody, nil
+}

@@ -9,6 +9,7 @@ var issuesModifyURL = issuesBaseURL + "{issue_id}"
 var issuesGetURL = issuesBaseURL + "{issue_id}"
 var issueGetTransitionsURL = issuesBaseURL + "{issue_id}/transitions"
 var issuesModifyStatusURL = issuesBaseURL + "{issue_id}/transitions/{transition_id}/_execute"
+var issueAppendCommentURL = issuesBaseURL + "{issue_id}/comments"
 
 var prioritiesBaseURL = "/priorities/"
 var prioritiesGetURL = prioritiesBaseURL
