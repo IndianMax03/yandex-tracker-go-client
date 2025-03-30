@@ -21,7 +21,7 @@ type CommentRequest struct {
 	MarkupType string `json:"markupType,omitempty"`
 }
 
-// describes response after adding comment on the issue.
+// CommentResponse describes response after adding comment on the issue.
 type CommentResponse struct {
 	// Link to comment.
 	Self string `json:"self"`
