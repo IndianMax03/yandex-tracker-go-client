@@ -21,6 +21,13 @@ type IssueModifyStatusResponse struct {
 	To NextTransition `json:"to"`
 }
 
+// IssueTransitionsResponse describes response of all possible issue transitions
+type IssueTransitionsResponse struct {
+	ObjectBaseResponse
+	// A block with status information to which a issue can be transferred.
+	To NextTransition `json:"to"`
+}
+
 // NextTransition describes next possible issue transitions.
 type NextTransition struct {
 	ObjectBaseResponse

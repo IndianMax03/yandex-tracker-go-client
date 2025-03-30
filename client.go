@@ -4,6 +4,7 @@ package client
 import (
 	"fmt"
 	"io"
+	"net/url"
 	"strconv"
 
 	model "github.com/IndianMax03/yandex-tracker-go-client/model"
@@ -15,6 +16,7 @@ const (
 	defaultContentType = "application/json"
 	defaultLang        = "ru"
 	defaultAuthScheme  = "OAuth"
+	defaultPerPage     = 3
 )
 
 // Client is a wrapper over the resty.Client type with Yandex Tracker API-specific headers and a base URL
@@ -50,7 +52,15 @@ func New(tokenOAuth, xCloudOrgID, xOrgID, acceptLanguage string) *Client {
 }
 
 // SendRequest sends request to Yandex Tracker
-func (c *Client) SendRequest(method, resourceURL string, queryParams map[string]string, pathParams map[string]string, requestBody, responseBody any) (resp *resty.Response, err error) {
+func (c *Client) SendRequest(
+	method,
+	resourceURL string,
+	queryParams map[string]string,
+	multiplyQueryParams url.Values,
+	pathParams map[string]string,
+	requestBody,
+	responseBody any,
+) (resp *resty.Response, err error) {
 	req := c.restyClient.R().
 		SetContentType(defaultContentType).
 		SetMethod(method).
@@ -58,6 +68,7 @@ func (c *Client) SendRequest(method, resourceURL string, queryParams map[string]
 		SetResult(responseBody).
 		SetURL(c.restyClient.BaseURL() + resourceURL).
 		SetQueryParams(queryParams).
+		SetQueryParamsFromValues(multiplyQueryParams).
 		SetPathParams(pathParams)
 	resp, err = req.Send()
 	return
@@ -76,7 +87,45 @@ func (c *Client) CreateIssue(req *model.IssueCreateRequest) (*model.IssueRespons
 		issuesCreateURL,
 		nil,
 		nil,
+		nil,
 		req,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return &respBody, nil
+}
+
+// GetIssue sends request to find concrete issue by ID
+func (c *Client) GetIssue(issueID string, includeAttachments, includeTransitions bool) (*model.IssueResponse, error) {
+	var respBody model.IssueResponse
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueID
+	var multiplyQueryParams url.Values
+	if includeAttachments || includeTransitions {
+		values := []string{}
+		if includeAttachments {
+			values = append(values, "attachments")
+		}
+		if includeTransitions {
+			values = append(values, "transitions")
+		}
+		multiplyQueryParams = url.Values{
+			"expand": values,
+		}
+	}
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		issuesGetURL,
+		nil,
+		multiplyQueryParams,
+		pathParams,
+		nil,
 		&respBody,
 	)
 	if err != nil {
@@ -95,6 +144,7 @@ func (c *Client) GetIssuesCount(req *model.IssueCountRequest) (int, error) {
 	res, err := c.SendRequest(
 		resty.MethodPost,
 		issuesCountURL,
+		nil,
 		nil,
 		nil,
 		req,
@@ -128,6 +178,7 @@ func (c *Client) SearchIssuesPage(req *model.IssueSearchRequest, pageReq *model.
 		issuesSearchURL,
 		queryParams,
 		nil,
+		nil,
 		req,
 		&respBody,
 	)
@@ -153,7 +204,7 @@ func (c *Client) SearchAllIssues(req *model.IssueSearchRequest) ([]model.IssueRe
 	currentPage := 1
 	pageReq := model.PageRequest{
 		Page:    currentPage,
-		PerPage: 50,
+		PerPage: defaultPerPage,
 	}
 
 	result, pag, err := c.SearchIssuesPage(req, &pageReq)
@@ -179,6 +230,7 @@ func (c *Client) ModifyIssue(issueID string, req *model.IssueModifyRequest) (*mo
 		resty.MethodPatch,
 		issuesModifyURL,
 		nil,
+		nil,
 		pathParams,
 		req,
 		&respBody,
@@ -203,9 +255,10 @@ func (c *Client) ModifyIssueStatus(issueID string, transitionID string, req *mod
 		resty.MethodPost,
 		issuesModifyStatusURL,
 		nil,
+		nil,
 		pathParams,
 		req,
-		respBody,
+		&respBody,
 	)
 	if err != nil {
 		return nil, err
@@ -215,4 +268,142 @@ func (c *Client) ModifyIssueStatus(issueID string, transitionID string, req *mod
 		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
 	}
 	return respBody, nil
+}
+
+// GetIssueTransitions sends a request to find all possible issue transitions
+func (c *Client) GetIssueTransitions(issueID string) ([]model.IssueTransitionsResponse, error) {
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueID
+	var respBody []model.IssueTransitionsResponse
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		issueGetTransitionsURL,
+		nil,
+		nil,
+		pathParams,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return respBody, nil
+}
+
+// GetPrioritiesPage sends a request to find priorities using pagination
+func (c *Client) GetPrioritiesPage(localized bool, pageReq *model.PageRequest) ([]model.PriorityResponse, *model.PageResponse, error) {
+	if pageReq.PerPage <= 0 {
+		pageReq.PerPage = 5
+	}
+	if pageReq.Page <= 0 {
+		pageReq.Page = 1
+	}
+	queryParams := make(map[string]string)
+	queryParams["perPage"] = strconv.Itoa(pageReq.PerPage)
+	queryParams["page"] = strconv.Itoa(pageReq.Page)
+
+	queryParams["localized"] = strconv.FormatBool(localized)
+	var respBody []model.PriorityResponse
+
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		prioritiesGetURL,
+		queryParams,
+		nil,
+		nil,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	totalPages, _ := strconv.Atoi(res.Header().Get("X-Total-Pages"))
+	totalCount, _ := strconv.Atoi(res.Header().Get("X-Total-Count"))
+	pageResp := model.PageResponse{
+		TotalPages: totalPages,
+		TotalCount: totalCount,
+	}
+	return respBody, &pageResp, nil
+}
+
+// GetAllPriorities sends a request to find all priorities
+func (c *Client) GetAllPriorities(localized bool) ([]model.PriorityResponse, error) {
+	currentPage := 1
+	pageReq := model.PageRequest{
+		Page:    currentPage,
+		PerPage: defaultPerPage,
+	}
+
+	result, pag, err := c.GetPrioritiesPage(localized, &pageReq)
+	if err != nil {
+		return nil, err
+	}
+	totalPages := pag.TotalPages
+	for currentPage < totalPages {
+		currentPage++
+		pageReq.Page = currentPage
+		resp, _, _ := c.GetPrioritiesPage(localized, &pageReq)
+		result = append(result, resp...)
+	}
+	return result, nil
+}
+
+// GetPriority sends a request to find concrete priority
+func (c *Client) GetPriority(priorityID int, localized bool) (*model.PriorityResponse, error) {
+	queryParams := make(map[string]string)
+	queryParams["localized"] = strconv.FormatBool(localized)
+	pathParams := make(map[string]string)
+	pathParams["priority_id"] = strconv.Itoa(priorityID)
+
+	var respBody model.PriorityResponse
+
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		priorityGetURL,
+		queryParams,
+		nil,
+		pathParams,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return &respBody, nil
+}
+
+// CreateComment sends a request to add a comment to a issue
+func (c *Client) CreateComment(issueID string, req *model.CommentRequest) (*model.CommentResponse, error) {
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueID
+	var respBody model.CommentResponse
+	res, err := c.SendRequest(
+		resty.MethodPost,
+		issueAppendCommentURL,
+		nil,
+		nil,
+		pathParams,
+		req,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return &respBody, nil
 }

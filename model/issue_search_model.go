@@ -44,7 +44,7 @@ type IssueResponse struct {
 	// An object with information about the parent issue.
 	Parent IssueParent `json:"parent"`
 	// An object containing information about the last employee who modified the issue.
-	UpdatedBy IssueUpdatedBy `json:"updatedBy"`
+	UpdatedBy UpdatedBy `json:"updatedBy"`
 	// Description of the issue.
 	Description string `json:"description"`
 	// An array of objects containing information about the sprint.
@@ -58,7 +58,7 @@ type IssueResponse struct {
 	// An array of objects containing information about the issue's observers.
 	Followers IssueFollowers `json:"followers"`
 	// An object containing information about the issue creator.
-	CreatedBy IssueCreatedBy `json:"createdBy"`
+	CreatedBy CreatedBy `json:"createdBy"`
 	// An object with information about the issue performer.
 	Assignee IssueAssignee `json:"assignee"`
 	// Number of votes for the issue.
@@ -79,4 +79,8 @@ type IssueResponse struct {
 	// true — the user added the issue to favorites;
 	// false — the issue was not added to favorites.
 	Favorite bool `json:"favorite"`
+	// An array of objects describing the attachments
+	Attachments []Attachment `json:"attachments"`
+	// An array of objects describing possible issue transitions
+	Transitions []Transition `json:"transitions"`
 }
