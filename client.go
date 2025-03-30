@@ -16,6 +16,7 @@ const (
 	defaultContentType = "application/json"
 	defaultLang        = "ru"
 	defaultAuthScheme  = "OAuth"
+	defaultPerPage     = 3
 )
 
 // Client is a wrapper over the resty.Client type with Yandex Tracker API-specific headers and a base URL
@@ -202,7 +203,7 @@ func (c *Client) SearchAllIssues(req *model.IssueSearchRequest) ([]model.IssueRe
 	currentPage := 1
 	pageReq := model.PageRequest{
 		Page:    currentPage,
-		PerPage: 50,
+		PerPage: defaultPerPage,
 	}
 
 	result, pag, err := c.SearchIssuesPage(req, &pageReq)
@@ -266,4 +267,91 @@ func (c *Client) ModifyIssueStatus(issueID string, transitionID string, req *mod
 		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
 	}
 	return respBody, nil
+}
+
+func (c *Client) GetPrioritiesPage(localized bool, pageReq *model.PageRequest) ([]model.PriorityResponse, *model.PageResponse, error) {
+	if pageReq.PerPage <= 0 {
+		pageReq.PerPage = 5
+	}
+	if pageReq.Page <= 0 {
+		pageReq.Page = 1
+	}
+	queryParams := make(map[string]string)
+	queryParams["perPage"] = strconv.Itoa(pageReq.PerPage)
+	queryParams["page"] = strconv.Itoa(pageReq.Page)
+
+	queryParams["localized"] = strconv.FormatBool(localized)
+	var respBody []model.PriorityResponse
+
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		prioritiesGetURL,
+		queryParams,
+		nil,
+		nil,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	totalPages, _ := strconv.Atoi(res.Header().Get("X-Total-Pages"))
+	totalCount, _ := strconv.Atoi(res.Header().Get("X-Total-Count"))
+	pageResp := model.PageResponse{
+		TotalPages: totalPages,
+		TotalCount: totalCount,
+	}
+	return respBody, &pageResp, nil
+}
+
+func (c *Client) GetAllPriorities(localized bool) ([]model.PriorityResponse, error) {
+	currentPage := 1
+	pageReq := model.PageRequest{
+		Page:    currentPage,
+		PerPage: defaultPerPage,
+	}
+
+	result, pag, err := c.GetPrioritiesPage(localized, &pageReq)
+	if err != nil {
+		return nil, err
+	}
+	totalPages := pag.TotalPages
+	for currentPage < totalPages {
+		currentPage++
+		pageReq.Page = currentPage
+		resp, _, _ := c.GetPrioritiesPage(localized, &pageReq)
+		result = append(result, resp...)
+	}
+	return result, nil
+}
+
+func (c *Client) GetPriority(priorityID int, localized bool) (*model.PriorityResponse, error) {
+	queryParams := make(map[string]string)
+	queryParams["localized"] = strconv.FormatBool(localized)
+	pathParams := make(map[string]string)
+	pathParams["priority_id"] = strconv.Itoa(priorityID)
+
+	var respBody model.PriorityResponse
+
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		priorityGetURL,
+		queryParams,
+		nil,
+		pathParams,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return &respBody, nil
 }

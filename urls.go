@@ -8,3 +8,7 @@ var issuesSearchURL = issuesBaseURL + "_search"
 var issuesModifyURL = issuesBaseURL + "{issue_id}"
 var issuesGetURL = issuesBaseURL + "{issue_id}"
 var issuesModifyStatusURL = issuesBaseURL + "{issue_id}/transitions/{transition_id}/_execute"
+
+var prioritiesBaseURL = "/priorities/"
+var prioritiesGetURL = prioritiesBaseURL
+var priorityGetURL = prioritiesBaseURL + "{priority_id}"
