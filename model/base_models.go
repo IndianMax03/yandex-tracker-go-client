@@ -83,3 +83,9 @@ type IssuePreviousStatus struct {
 	ObjectBaseResponse
 	Key string `json:"key"`
 }
+
+// Attachment describes issue attachment
+type Attachment ObjectBaseResponse
+
+// Transition describes possible issue transition
+type Transition ObjectBaseResponse

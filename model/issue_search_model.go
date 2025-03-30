@@ -79,4 +79,8 @@ type IssueResponse struct {
 	// true — the user added the issue to favorites;
 	// false — the issue was not added to favorites.
 	Favorite bool `json:"favorite"`
+	// An array of objects describing the attachments
+	Attachments []Attachment `json:"attachments"`
+	// An array of objects describing possible issue transitions
+	Transitions []Transition `json:"transitions"`
 }
