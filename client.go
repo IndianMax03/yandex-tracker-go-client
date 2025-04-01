@@ -16,7 +16,7 @@ const (
 	defaultContentType = "application/json"
 	defaultLang        = "ru"
 	defaultAuthScheme  = "OAuth"
-	defaultPerPage     = 3
+	defaultPerPage     = 50
 )
 
 // Client is a wrapper over the resty.Client type with Yandex Tracker API-specific headers and a base URL
@@ -406,4 +406,150 @@ func (c *Client) CreateComment(issueID string, req *model.CommentRequest) (*mode
 		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
 	}
 	return &respBody, nil
+}
+
+// GetComment sends a request to get concrete comment to a issue
+func (c *Client) GetComment(issueID string, commentID int) (*model.CommentResponse, error) {
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueID
+	commentStringID := strconv.Itoa(commentID)
+	pathParams["comment_id"] = commentStringID
+	var respBody model.CommentResponse
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		issueGetCommentURL,
+		nil,
+		nil,
+		pathParams,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return &respBody, nil
+}
+
+// GetXCommentsAfterY sends a request to get first X comments after comment with ID=Y (model.PageRequest.PerPage = X, model.PageRequest.FromID = Y)
+func (c *Client) GetXCommentsAfterY(issueID string, commentExpand string, pageReq *model.PageRequest) ([]model.CommentResponse, *model.PageResponse, error) {
+	if pageReq.PerPage <= 0 {
+		pageReq.PerPage = defaultPerPage
+	}
+	queryParams := make(map[string]string)
+	if commentExpand != model.ExpandNone {
+		queryParams["expand"] = commentExpand
+	}
+
+	queryParams["perPage"] = strconv.Itoa(pageReq.PerPage)
+	if pageReq.FromID > 0 {
+		queryParams["id"] = strconv.Itoa(pageReq.FromID)
+	}
+
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueID
+	var respBody []model.CommentResponse
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		issueGetCommentsURL,
+		queryParams,
+		nil,
+		pathParams,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	totalPages, _ := strconv.Atoi(res.Header().Get("X-Total-Pages"))
+	totalCount, _ := strconv.Atoi(res.Header().Get("X-Total-Count"))
+	var lastID int
+	if len(respBody) != 0 {
+		lastID = respBody[len(respBody)-1].ID
+	}
+	pageResp := model.PageResponse{
+		TotalPages: totalPages,
+		TotalCount: totalCount,
+		LastID:     lastID,
+	}
+	return respBody, &pageResp, nil
+}
+
+// GetCommentsAll sends requests to get all of the comments using default perPage size
+func (c *Client) GetCommentsAll(issueID string, commentExpand string) ([]model.CommentResponse, error) {
+	pageReq := model.PageRequest{
+		PerPage: defaultPerPage,
+	}
+
+	result, pag, err := c.GetXCommentsAfterY(issueID, commentExpand, &pageReq)
+	if err != nil {
+		return nil, err
+	}
+	fromID := pag.LastID
+	for fromID > 0 {
+		pageReq.FromID = fromID
+		resp, pagResp, _ := c.GetXCommentsAfterY(issueID, commentExpand, &pageReq)
+		fromID = pagResp.LastID
+		result = append(result, resp...)
+	}
+	return result, nil
+}
+
+// UpdateComment sends a request to update a comment to a issue
+func (c *Client) UpdateComment(issueID string, commentID int, req *model.CommentUpdateRequest) (*model.CommentResponse, error) {
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueID
+	commentStringID := strconv.Itoa(commentID)
+	pathParams["comment_id"] = commentStringID
+	var respBody model.CommentResponse
+	res, err := c.SendRequest(
+		resty.MethodPatch,
+		issueUpdateCommentURL,
+		nil,
+		nil,
+		pathParams,
+		req,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return &respBody, nil
+}
+
+// DeleteComment sends a request to delete a comment to a issue
+func (c *Client) DeleteComment(issueID string, commentID int) error {
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueID
+	commentStringID := strconv.Itoa(commentID)
+	pathParams["comment_id"] = commentStringID
+	var respBody model.CommentResponse
+	res, err := c.SendRequest(
+		resty.MethodDelete,
+		issueDeleteCommentURL,
+		nil,
+		nil,
+		pathParams,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return nil
 }

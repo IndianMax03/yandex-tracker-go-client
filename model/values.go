@@ -27,6 +27,14 @@ const (
 	DontDo        = "dontDo"
 )
 
+// Comment expand
+const (
+	ExpandAttachments = "attachments"
+	ExpandHTML        = "html"
+	ExpandAll         = "all"
+	ExpandNone        = ""
+)
+
 // Issue Transition IDs
 const (
 	InProgrssTransitionID    = "start_progress"

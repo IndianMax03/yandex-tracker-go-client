@@ -31,6 +31,10 @@ type CommentResponse struct {
 	LongID string `json:"longId"`
 	// Commentary on the issue.
 	Text string `json:"text"`
+	// HTML markup of the comment.
+	TextHTML string `json:"textHtml"`
+	// Attachments to the comment.
+	Attachments []Attachment `json:"attachments"`
 	// Block with information about the user who added the comment.
 	CreatedBy CreatedBy `json:"createdBy"`
 	// Block with information about the user who last changed the comment.
@@ -54,6 +58,22 @@ type CommentResponse struct {
 	// internal — via the Tracker interface;
 	// email — via letter.
 	Transport string `json:"transport"`
+}
+
+// CommentUpdateRequest describes request to update comment on the issue.
+type CommentUpdateRequest struct {
+	// Mandatory
+
+	// Commentary on the issue.
+	Text string `json:"text"`
+
+	// Optional
+
+	// IDs of temporary files to be added as attachments.
+	AttachmentIds []string `json:"attachmentIds,omitempty"`
+	// The type of markup displayed in the text.
+	// If you use YFM markup in the issue description text, specify the md value.
+	MarkupType string `json:"markupType,omitempty"`
 }
 
 // Summonees is a users who are invited.

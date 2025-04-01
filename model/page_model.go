@@ -7,6 +7,8 @@ type PageRequest struct {
 	PerPage int
 	// Page number
 	Page int
+	// ID parameter of the object after which the requested page will begin
+	FromID int
 }
 
 // PageResponse describes pagination response headers
@@ -15,4 +17,6 @@ type PageResponse struct {
 	TotalPages int
 	// Total number of objects
 	TotalCount int
+	// ID parameter of the object that was the last one on the requested page
+	LastID int
 }
