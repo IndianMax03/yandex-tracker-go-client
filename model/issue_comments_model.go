@@ -31,6 +31,10 @@ type CommentResponse struct {
 	LongID string `json:"longId"`
 	// Commentary on the issue.
 	Text string `json:"text"`
+	// HTML markup of the comment.
+	TextHTML string `json:"textHtml"`
+	// Attachments to the comment.
+	Attachments []Attachment `json:"attachments"`
 	// Block with information about the user who added the comment.
 	CreatedBy CreatedBy `json:"createdBy"`
 	// Block with information about the user who last changed the comment.
