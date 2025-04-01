@@ -11,6 +11,7 @@ var issueGetTransitionsURL = issuesBaseURL + "{issue_id}/transitions"
 var issuesModifyStatusURL = issuesBaseURL + "{issue_id}/transitions/{transition_id}/_execute"
 var issueAppendCommentURL = issuesBaseURL + "{issue_id}/comments"
 var issueGetCommentsURL = issuesBaseURL + "{issue_id}/comments"
+var issueGetCommentURL = issuesBaseURL + "{issue_id}/comments/{comment_id}"
 var issueUpdateCommentURL = issuesBaseURL + "{issue_id}/comments/{comment_id}"
 var issueDeleteCommentURL = issuesBaseURL + "{issue_id}/comments/{comment_id}"
 

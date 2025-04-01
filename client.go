@@ -408,6 +408,32 @@ func (c *Client) CreateComment(issueID string, req *model.CommentRequest) (*mode
 	return &respBody, nil
 }
 
+// GetComment sends a request to get concrete comment to a issue
+func (c *Client) GetComment(issueID string, commentID int) (*model.CommentResponse, error) {
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueID
+	commentStringID := strconv.Itoa(commentID)
+	pathParams["comment_id"] = commentStringID
+	var respBody model.CommentResponse
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		issueGetCommentURL,
+		nil,
+		nil,
+		pathParams,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return &respBody, nil
+}
+
 // GetXCommentsAfterY sends a request to get first X comments after comment with ID=Y (model.PageRequest.PerPage = X, model.PageRequest.FromID = Y)
 func (c *Client) GetXCommentsAfterY(issueID string, commentExpand string, pageReq *model.PageRequest) ([]model.CommentResponse, *model.PageResponse, error) {
 	if pageReq.PerPage <= 0 {
