@@ -408,8 +408,8 @@ func (c *Client) CreateComment(issueID string, req *model.CommentRequest) (*mode
 	return &respBody, nil
 }
 
-// GetXComments sends a request to get first X comments (model.PageRequest.perPage = X)
-func (c *Client) GetXComments(issueID string, commentExpand string, pageReq *model.PageRequest) ([]model.CommentResponse, *model.PageResponse, error) {
+// GetXCommentsAfterY sends a request to get first X comments after comment with ID=Y (model.PageRequest.PerPage = X, model.PageRequest.FromID = Y)
+func (c *Client) GetXCommentsAfterY(issueID string, commentExpand string, pageReq *model.PageRequest) ([]model.CommentResponse, *model.PageResponse, error) {
 	if pageReq.PerPage <= 0 {
 		pageReq.PerPage = defaultPerPage
 	}
@@ -462,14 +462,14 @@ func (c *Client) GetCommentsAll(issueID string, commentExpand string) ([]model.C
 		PerPage: defaultPerPage,
 	}
 
-	result, pag, err := c.GetXComments(issueID, commentExpand, &pageReq)
+	result, pag, err := c.GetXCommentsAfterY(issueID, commentExpand, &pageReq)
 	if err != nil {
 		return nil, err
 	}
 	fromID := pag.LastID
 	for fromID > 0 {
 		pageReq.FromID = fromID
-		resp, pagResp, _ := c.GetXComments(issueID, commentExpand, &pageReq)
+		resp, pagResp, _ := c.GetXCommentsAfterY(issueID, commentExpand, &pageReq)
 		fromID = pagResp.LastID
 		result = append(result, resp...)
 	}
