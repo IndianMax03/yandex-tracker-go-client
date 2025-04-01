@@ -475,3 +475,29 @@ func (c *Client) GetCommentsAll(issueID string, commentExpand string) ([]model.C
 	}
 	return result, nil
 }
+
+// UpdateComment sends a request to update a comment to a issue
+func (c *Client) UpdateComment(issueID string, commentID int, req *model.CommentUpdateRequest) (*model.CommentResponse, error) {
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueID
+	commentStringID := strconv.Itoa(commentID)
+	pathParams["comment_id"] = commentStringID
+	var respBody model.CommentResponse
+	res, err := c.SendRequest(
+		resty.MethodPatch,
+		issueUpdateCommentURL,
+		nil,
+		nil,
+		pathParams,
+		req,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return &respBody, nil
+}

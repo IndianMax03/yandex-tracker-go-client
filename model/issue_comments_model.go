@@ -60,6 +60,22 @@ type CommentResponse struct {
 	Transport string `json:"transport"`
 }
 
+// CommentUpdateRequest describes request to update comment on the issue.
+type CommentUpdateRequest struct {
+	// Mandatory
+
+	// Commentary on the issue.
+	Text string `json:"text"`
+
+	// Optional
+
+	// IDs of temporary files to be added as attachments.
+	AttachmentIds []string `json:"attachmentIds,omitempty"`
+	// The type of markup displayed in the text.
+	// If you use YFM markup in the issue description text, specify the md value.
+	MarkupType string `json:"markupType,omitempty"`
+}
+
 // Summonees is a users who are invited.
 type Summonees ObjectBaseResponse
 
