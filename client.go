@@ -553,3 +553,261 @@ func (c *Client) DeleteComment(issueID string, commentID int) error {
 	}
 	return nil
 }
+
+// GetMyself sends request to get information about the user account on whose behalf the API call is made.
+func (c *Client) GetMyself() (*model.UserResponse, error) {
+	var respBody model.UserResponse
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		myselfURL,
+		nil,
+		nil,
+		nil,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return &respBody, nil
+}
+
+// GetUsersPage sends a request to find users using pagination
+func (c *Client) GetUsersPage(pageReq *model.PageRequest) ([]model.UserResponse, *model.PageResponse, error) {
+	if pageReq.PerPage <= 0 {
+		pageReq.PerPage = 5
+	}
+	if pageReq.Page <= 0 {
+		pageReq.Page = 1
+	}
+	queryParams := make(map[string]string)
+	queryParams["perPage"] = strconv.Itoa(pageReq.PerPage)
+	queryParams["page"] = strconv.Itoa(pageReq.Page)
+
+	var respBody []model.UserResponse
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		usersGetURL,
+		queryParams,
+		nil,
+		nil,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+
+	totalPages, _ := strconv.Atoi(res.Header().Get("X-Total-Pages"))
+	totalCount, _ := strconv.Atoi(res.Header().Get("X-Total-Count"))
+	pageResp := model.PageResponse{
+		TotalPages: totalPages,
+		TotalCount: totalCount,
+	}
+	return respBody, &pageResp, nil
+}
+
+// GetUsersAll sends a request to find all users
+func (c *Client) GetUsersAll() ([]model.UserResponse, error) {
+	currentPage := 1
+	pageReq := model.PageRequest{
+		Page:    currentPage,
+		PerPage: defaultPerPage,
+	}
+
+	result, pag, err := c.GetUsersPage(&pageReq)
+	if err != nil {
+		return nil, err
+	}
+	totalPages := pag.TotalPages
+	for currentPage < totalPages {
+		currentPage++
+		pageReq.Page = currentPage
+		resp, _, _ := c.GetUsersPage(&pageReq)
+		result = append(result, resp...)
+	}
+	return result, nil
+}
+
+// GetUser sends request to get information about concrete user (login is a priority).
+func (c *Client) GetUser(login string, userID int) (*model.UserResponse, error) {
+	pathParams := make(map[string]string)
+	if login != "" {
+		allNums := true
+		for i := range len(login) {
+			if login[i] < '0' || login[i] > '9' {
+				allNums = false
+				break
+			}
+		}
+		if allNums {
+			pathParams["login_or_user_id"] = fmt.Sprintf("login:%s", login)
+		} else {
+			pathParams["login_or_user_id"] = login
+		}
+
+	} else {
+		pathParams["login_or_user_id"] = strconv.Itoa(userID)
+	}
+	var respBody model.UserResponse
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		userGetURL,
+		nil,
+		nil,
+		pathParams,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return &respBody, nil
+}
+
+// CreateComponent sends a request to create a component to a queue
+func (c *Client) CreateComponent(req *model.ComponentRequest) (*model.ComponentResponse, error) {
+	var respBody model.ComponentResponse
+	res, err := c.SendRequest(
+		resty.MethodPost,
+		componentCreateURL,
+		nil,
+		nil,
+		nil,
+		req,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return &respBody, nil
+}
+
+// UpdateComponent sends a request to update a component to a queue
+func (c *Client) UpdateComponent(componentID, componentVersion int, req *model.ComponentUpdateRequest) (*model.ComponentResponse, error) {
+	queryParams := make(map[string]string)
+	queryParams["version"] = strconv.Itoa(componentVersion)
+
+	pathParams := make(map[string]string)
+	pathParams["component_id"] = strconv.Itoa(componentID)
+
+	var respBody model.ComponentResponse
+	res, err := c.SendRequest(
+		resty.MethodPatch,
+		componentUpdateURL,
+		queryParams,
+		nil,
+		pathParams,
+		req,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return &respBody, nil
+}
+
+// GetComponentsPage sends a request to get components using pagination
+func (c *Client) GetComponentsPage(pageReq *model.PageRequest) ([]model.ComponentResponse, *model.PageResponse, error) {
+	if pageReq.PerPage <= 0 {
+		pageReq.PerPage = 5
+	}
+	if pageReq.Page <= 0 {
+		pageReq.Page = 1
+	}
+	queryParams := make(map[string]string)
+	queryParams["perPage"] = strconv.Itoa(pageReq.PerPage)
+	queryParams["page"] = strconv.Itoa(pageReq.Page)
+
+	var respBody []model.ComponentResponse
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		componentsGetURL,
+		queryParams,
+		nil,
+		nil,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+
+	totalPages, _ := strconv.Atoi(res.Header().Get("X-Total-Pages"))
+	totalCount, _ := strconv.Atoi(res.Header().Get("X-Total-Count"))
+	pageResp := model.PageResponse{
+		TotalPages: totalPages,
+		TotalCount: totalCount,
+	}
+	return respBody, &pageResp, nil
+}
+
+// GetComponentsAll sends a request to find all components
+func (c *Client) GetComponentsAll() ([]model.ComponentResponse, error) {
+	currentPage := 1
+	pageReq := model.PageRequest{
+		Page:    currentPage,
+		PerPage: defaultPerPage,
+	}
+
+	result, pag, err := c.GetComponentsPage(&pageReq)
+	if err != nil {
+		return nil, err
+	}
+	totalPages := pag.TotalPages
+	for currentPage < totalPages {
+		currentPage++
+		pageReq.Page = currentPage
+		resp, _, _ := c.GetComponentsPage(&pageReq)
+		result = append(result, resp...)
+	}
+	return result, nil
+}
+
+// GetComponent sends request to get information about concrete component.
+func (c *Client) GetComponent(componentID int) (*model.ComponentResponse, error) {
+	pathParams := make(map[string]string)
+	pathParams["component_id"] = strconv.Itoa(componentID)
+	var respBody model.ComponentResponse
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		componentGetURL,
+		nil,
+		nil,
+		pathParams,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return &respBody, nil
+}
