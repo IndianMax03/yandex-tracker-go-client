@@ -34,6 +34,10 @@ type ComponentResponse struct {
 	Name string `json:"name"`
 	// An object with information about the queue to which the component has been added.
 	Queue IssueQueue `json:"queue"`
+	// Description of the component.
+	Description string `json:"description"`
+	// Login of the component owner.
+	Lead string `json:"lead"`
 	// The flag indicating whether the owner is assigned as the default executor.
 	AssignAuto bool `json:"assignAuto"`
 }
@@ -51,3 +55,6 @@ type ComponentUpdateRequest struct {
 	// false — do not assign the default executor.
 	AssignAuto bool `json:"assignAuto,omitempty"`
 }
+
+// Lead describes block with information about the component owner.
+type Lead ObjectBaseResponse

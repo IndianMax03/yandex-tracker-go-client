@@ -27,4 +27,6 @@ var userGetURL = userBaseURL + "{login_or_user_id}"
 
 var componentBaseURL = "/components/"
 var componentCreateURL = componentBaseURL
+var componentsGetURL = componentBaseURL
+var componentGetURL = componentBaseURL + "{component_id}"
 var componentUpdateURL = componentBaseURL + "{component_id}"
