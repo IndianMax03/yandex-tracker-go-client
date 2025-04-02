@@ -636,3 +636,43 @@ func (c *Client) GetUsersAll() ([]model.UserResponse, error) {
 	}
 	return result, nil
 }
+
+// GetUser sends request to get information about concrete user (login is a priority).
+func (c *Client) GetUser(login string, userID int) (*model.UserResponse, error) {
+	pathParams := make(map[string]string)
+	if login != "" {
+		allNums := true
+		for i := range len(login) {
+			if login[i] < '0' || login[i] > '9' {
+				allNums = false
+				break
+			}
+		}
+		if allNums {
+			pathParams["login_or_user_id"] = fmt.Sprintf("login:%s", login)
+		} else {
+			pathParams["login_or_user_id"] = login
+		}
+
+	} else {
+		pathParams["login_or_user_id"] = strconv.Itoa(userID)
+	}
+	var respBody model.UserResponse
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		userGetURL,
+		nil,
+		nil,
+		pathParams,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return &respBody, nil
+}

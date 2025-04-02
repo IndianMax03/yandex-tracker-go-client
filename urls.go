@@ -23,3 +23,4 @@ var myselfURL = "/myself"
 
 var userBaseURL = "/users/"
 var usersGetURL = userBaseURL
+var userGetURL = userBaseURL + "{login_or_user_id}"
