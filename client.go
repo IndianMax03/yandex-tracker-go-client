@@ -676,3 +676,25 @@ func (c *Client) GetUser(login string, userID int) (*model.UserResponse, error) 
 	}
 	return &respBody, nil
 }
+
+// CreateComponent sends a request to create a component to a queue
+func (c *Client) CreateComponent(req *model.ComponentRequest) (*model.ComponentResponse, error) {
+	var respBody model.ComponentResponse
+	res, err := c.SendRequest(
+		resty.MethodPost,
+		componentCreateURL,
+		nil,
+		nil,
+		nil,
+		req,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return &respBody, nil
+}
