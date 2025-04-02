@@ -18,3 +18,5 @@ var issueDeleteCommentURL = issuesBaseURL + "{issue_id}/comments/{comment_id}"
 var prioritiesBaseURL = "/priorities/"
 var prioritiesGetURL = prioritiesBaseURL
 var priorityGetURL = prioritiesBaseURL + "{priority_id}"
+
+var myselfURL = "/myself"

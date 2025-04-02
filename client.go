@@ -553,3 +553,25 @@ func (c *Client) DeleteComment(issueID string, commentID int) error {
 	}
 	return nil
 }
+
+// GetMyself sends request to get information about the user account on whose behalf the API call is made.
+func (c *Client) GetMyself() (*model.MyselfResponse, error) {
+	var respBody model.MyselfResponse
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		myselfURL,
+		nil,
+		nil,
+		nil,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return &respBody, nil
+}
