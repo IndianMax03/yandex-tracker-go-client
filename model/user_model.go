@@ -1,7 +1,7 @@
 // Package model contains an entities for exchanging information with the Yandex Tracker API
 package model
 
-// MyselfResponse describes an object contains information about current user.
+// UserResponse describes an object contains information about user.
 type UserResponse struct {
 	// The address of the API resource that contains information about the user account.
 	Self string `json:"self"`
