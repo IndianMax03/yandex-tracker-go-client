@@ -37,3 +37,17 @@ type ComponentResponse struct {
 	// The flag indicating whether the owner is assigned as the default executor.
 	AssignAuto bool `json:"assignAuto"`
 }
+
+// ComponentUpdateRequest describes request to update a component
+type ComponentUpdateRequest struct {
+	// Component name.
+	Name string `json:"name,omitempty"`
+	// Description of the component.
+	Description string `json:"description,omitempty"`
+	// Login of the component owner.
+	Lead string `json:"lead,omitempty"`
+	// Default executor flag:
+	// true — assign the owner as the default executor;
+	// false — do not assign the default executor.
+	AssignAuto bool `json:"assignAuto,omitempty"`
+}

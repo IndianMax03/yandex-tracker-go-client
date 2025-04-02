@@ -698,3 +698,31 @@ func (c *Client) CreateComponent(req *model.ComponentRequest) (*model.ComponentR
 	}
 	return &respBody, nil
 }
+
+// UpdateComponent sends a request to update a component to a queue
+func (c *Client) UpdateComponent(componentID, componentVersion int, req *model.ComponentUpdateRequest) (*model.ComponentResponse, error) {
+	queryParams := make(map[string]string)
+	queryParams["version"] = strconv.Itoa(componentVersion)
+
+	pathParams := make(map[string]string)
+	pathParams["component_id"] = strconv.Itoa(componentID)
+
+	var respBody model.ComponentResponse
+	res, err := c.SendRequest(
+		resty.MethodPatch,
+		componentUpdateURL,
+		queryParams,
+		nil,
+		pathParams,
+		req,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return &respBody, nil
+}
