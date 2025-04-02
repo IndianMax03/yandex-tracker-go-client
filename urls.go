@@ -20,3 +20,6 @@ var prioritiesGetURL = prioritiesBaseURL
 var priorityGetURL = prioritiesBaseURL + "{priority_id}"
 
 var myselfURL = "/myself"
+
+var userBaseURL = "/users/"
+var usersGetURL = userBaseURL

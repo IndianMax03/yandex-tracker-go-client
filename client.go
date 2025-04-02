@@ -16,7 +16,7 @@ const (
 	defaultContentType = "application/json"
 	defaultLang        = "ru"
 	defaultAuthScheme  = "OAuth"
-	defaultPerPage     = 50
+	defaultPerPage     = 1
 )
 
 // Client is a wrapper over the resty.Client type with Yandex Tracker API-specific headers and a base URL
@@ -555,8 +555,8 @@ func (c *Client) DeleteComment(issueID string, commentID int) error {
 }
 
 // GetMyself sends request to get information about the user account on whose behalf the API call is made.
-func (c *Client) GetMyself() (*model.MyselfResponse, error) {
-	var respBody model.MyselfResponse
+func (c *Client) GetMyself() (*model.UserResponse, error) {
+	var respBody model.UserResponse
 	res, err := c.SendRequest(
 		resty.MethodGet,
 		myselfURL,
@@ -574,4 +574,65 @@ func (c *Client) GetMyself() (*model.MyselfResponse, error) {
 		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
 	}
 	return &respBody, nil
+}
+
+// GetUsersPage sends a request to find users using pagination
+func (c *Client) GetUsersPage(pageReq *model.PageRequest) ([]model.UserResponse, *model.PageResponse, error) {
+	if pageReq.PerPage <= 0 {
+		pageReq.PerPage = 5
+	}
+	if pageReq.Page <= 0 {
+		pageReq.Page = 1
+	}
+	queryParams := make(map[string]string)
+	queryParams["perPage"] = strconv.Itoa(pageReq.PerPage)
+	queryParams["page"] = strconv.Itoa(pageReq.Page)
+
+	var respBody []model.UserResponse
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		usersGetURL,
+		queryParams,
+		nil,
+		nil,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+
+	totalPages, _ := strconv.Atoi(res.Header().Get("X-Total-Pages"))
+	totalCount, _ := strconv.Atoi(res.Header().Get("X-Total-Count"))
+	pageResp := model.PageResponse{
+		TotalPages: totalPages,
+		TotalCount: totalCount,
+	}
+	return respBody, &pageResp, nil
+}
+
+// GetUsersAll sends a request to find all users
+func (c *Client) GetUsersAll() ([]model.UserResponse, error) {
+	currentPage := 1
+	pageReq := model.PageRequest{
+		Page:    currentPage,
+		PerPage: defaultPerPage,
+	}
+
+	result, pag, err := c.GetUsersPage(&pageReq)
+	if err != nil {
+		return nil, err
+	}
+	totalPages := pag.TotalPages
+	for currentPage < totalPages {
+		currentPage++
+		pageReq.Page = currentPage
+		resp, _, _ := c.GetUsersPage(&pageReq)
+		result = append(result, resp...)
+	}
+	return result, nil
 }

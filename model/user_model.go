@@ -2,7 +2,7 @@
 package model
 
 // MyselfResponse describes an object contains information about current user.
-type MyselfResponse struct {
+type UserResponse struct {
 	// The address of the API resource that contains information about the user account.
 	Self string `json:"self"`
 	// Unique identifier of the user account in Tracker.
