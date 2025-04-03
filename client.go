@@ -907,3 +907,28 @@ func (c *Client) UploadTemporaryAttachment(multipartReq *resty.MultipartField) (
 	}
 	return respBody, nil
 }
+
+// IssueAttachFile sends request to upload an attachment to attach to issue.
+func (c *Client) IssueAttachFile(issueID string, multipartReq *resty.MultipartField) (*model.AttachmentFileResponse, error) {
+	var respBody *model.AttachmentFileResponse
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueID
+	multipartReq.Name = "filename"
+	res, err := c.SendMultipartRequest(
+		resty.MethodPost,
+		issueAttachFileURL,
+		nil,
+		nil,
+		pathParams,
+		multipartReq,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return respBody, nil
+}
