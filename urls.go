@@ -14,6 +14,8 @@ var issueGetCommentsURL = issuesBaseURL + "{issue_id}/comments"
 var issueGetCommentURL = issuesBaseURL + "{issue_id}/comments/{comment_id}"
 var issueUpdateCommentURL = issuesBaseURL + "{issue_id}/comments/{comment_id}"
 var issueDeleteCommentURL = issuesBaseURL + "{issue_id}/comments/{comment_id}"
+var issueGetAttachments = issuesBaseURL + "{issue_id}/attachments"
+var issueGetAttachment = issuesBaseURL + "{issue_id}/attachments/{attachment_id}"
 
 var prioritiesBaseURL = "/priorities/"
 var prioritiesGetURL = prioritiesBaseURL

@@ -811,3 +811,52 @@ func (c *Client) GetComponent(componentID int) (*model.ComponentResponse, error)
 	}
 	return &respBody, nil
 }
+
+// GetIssueAttachments sends request to get attachments to issue.
+func (c *Client) GetIssueAttachments(issueID string) ([]model.AttachmentFileResponse, error) {
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueID
+	var respBody []model.AttachmentFileResponse
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		issueGetAttachments,
+		nil,
+		nil,
+		pathParams,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return respBody, nil
+}
+
+// GetIssueAttachment sends request to get concrete attachment to issue.
+func (c *Client) GetIssueAttachment(issueID, attachmentID string) (*model.AttachmentFileResponse, error) {
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueID
+	pathParams["attachment_id"] = attachmentID
+	var respBody *model.AttachmentFileResponse
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		issueGetAttachment,
+		nil,
+		nil,
+		pathParams,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return respBody, nil
+}
