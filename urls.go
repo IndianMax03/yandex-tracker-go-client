@@ -17,6 +17,7 @@ var issueDeleteCommentURL = issuesBaseURL + "{issue_id}/comments/{comment_id}"
 var issueGetAttachmentsURL = issuesBaseURL + "{issue_id}/attachments"
 var issueGetAttachmentURL = issuesBaseURL + "{issue_id}/attachments/{attachment_id}"
 var issueAttachFileURL = issuesBaseURL + "{issue_id}/attachments"
+var issueDeleteFileURL = issuesBaseURL + "{issue_id}/attachments/{file_id}"
 
 var attachmentsBase = "/attachments/"
 var attachmentUploadURL = attachmentsBase

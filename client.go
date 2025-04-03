@@ -932,3 +932,27 @@ func (c *Client) IssueAttachFile(issueID string, multipartReq *resty.MultipartFi
 	}
 	return respBody, nil
 }
+
+// IssueDeleteFile sends request to delete an attachment in issue.
+func (c *Client) IssueDeleteFile(issueID, fileID string) error {
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueID
+	pathParams["file_id"] = fileID
+	res, err := c.SendRequest(
+		resty.MethodDelete,
+		issueDeleteFileURL,
+		nil,
+		nil,
+		pathParams,
+		nil,
+		nil,
+	)
+	if err != nil {
+		return err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return nil
+}
