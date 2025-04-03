@@ -74,6 +74,30 @@ func (c *Client) SendRequest(
 	return
 }
 
+// SendMultipartRequest sends multipart request to Yandex Tracker
+func (c *Client) SendMultipartRequest(
+	method,
+	resourceURL string,
+	queryParams map[string]string,
+	multiplyQueryParams url.Values,
+	pathParams map[string]string,
+	requestBody *resty.MultipartField,
+	responseBody any,
+) (resp *resty.Response, err error) {
+	req := c.restyClient.R().
+		SetContentType(defaultContentType).
+		SetMethod(method).
+		SetMultipartFields(requestBody).
+		SetResult(responseBody).
+		SetURL(c.restyClient.BaseURL() + resourceURL).
+		SetQueryParams(queryParams).
+		SetQueryParamsFromValues(multiplyQueryParams).
+		SetPathParams(pathParams)
+
+	resp, err = req.Send()
+	return
+}
+
 // SetDebug allows logging of details of each request and response.
 func (c *Client) SetDebug(debug bool) {
 	c.restyClient.SetDebug(debug)
@@ -819,7 +843,7 @@ func (c *Client) GetIssueAttachments(issueID string) ([]model.AttachmentFileResp
 	var respBody []model.AttachmentFileResponse
 	res, err := c.SendRequest(
 		resty.MethodGet,
-		issueGetAttachments,
+		issueGetAttachmentsURL,
 		nil,
 		nil,
 		pathParams,
@@ -844,11 +868,34 @@ func (c *Client) GetIssueAttachment(issueID, attachmentID string) (*model.Attach
 	var respBody *model.AttachmentFileResponse
 	res, err := c.SendRequest(
 		resty.MethodGet,
-		issueGetAttachment,
+		issueGetAttachmentURL,
 		nil,
 		nil,
 		pathParams,
 		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return respBody, nil
+}
+
+// UploadTemporaryAttachment sends request to upload temporary attachment.
+func (c *Client) UploadTemporaryAttachment(multipartReq *resty.MultipartField) (*model.AttachmentFileResponse, error) {
+	var respBody *model.AttachmentFileResponse
+	multipartReq.Name = "filename"
+	res, err := c.SendMultipartRequest(
+		resty.MethodPost,
+		attachmentUploadURL,
+		nil,
+		nil,
+		nil,
+		multipartReq,
 		&respBody,
 	)
 	if err != nil {
