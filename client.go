@@ -74,6 +74,30 @@ func (c *Client) SendRequest(
 	return
 }
 
+// SendMultipartRequest sends multipart request to Yandex Tracker
+func (c *Client) SendMultipartRequest(
+	method,
+	resourceURL string,
+	queryParams map[string]string,
+	multiplyQueryParams url.Values,
+	pathParams map[string]string,
+	requestBody *resty.MultipartField,
+	responseBody any,
+) (resp *resty.Response, err error) {
+	req := c.restyClient.R().
+		SetContentType(defaultContentType).
+		SetMethod(method).
+		SetMultipartFields(requestBody).
+		SetResult(responseBody).
+		SetURL(c.restyClient.BaseURL() + resourceURL).
+		SetQueryParams(queryParams).
+		SetQueryParamsFromValues(multiplyQueryParams).
+		SetPathParams(pathParams)
+
+	resp, err = req.Send()
+	return
+}
+
 // SetDebug allows logging of details of each request and response.
 func (c *Client) SetDebug(debug bool) {
 	c.restyClient.SetDebug(debug)
@@ -810,4 +834,125 @@ func (c *Client) GetComponent(componentID int) (*model.ComponentResponse, error)
 		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
 	}
 	return &respBody, nil
+}
+
+// GetIssueAttachments sends request to get attachments to issue.
+func (c *Client) GetIssueAttachments(issueID string) ([]model.AttachmentFileResponse, error) {
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueID
+	var respBody []model.AttachmentFileResponse
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		issueGetAttachmentsURL,
+		nil,
+		nil,
+		pathParams,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return respBody, nil
+}
+
+// GetIssueAttachment sends request to get concrete attachment to issue.
+func (c *Client) GetIssueAttachment(issueID, attachmentID string) (*model.AttachmentFileResponse, error) {
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueID
+	pathParams["attachment_id"] = attachmentID
+	var respBody *model.AttachmentFileResponse
+	res, err := c.SendRequest(
+		resty.MethodGet,
+		issueGetAttachmentURL,
+		nil,
+		nil,
+		pathParams,
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return respBody, nil
+}
+
+// UploadTemporaryAttachment sends request to upload temporary attachment.
+func (c *Client) UploadTemporaryAttachment(multipartReq *resty.MultipartField) (*model.AttachmentFileResponse, error) {
+	var respBody *model.AttachmentFileResponse
+	multipartReq.Name = "filename"
+	res, err := c.SendMultipartRequest(
+		resty.MethodPost,
+		attachmentUploadURL,
+		nil,
+		nil,
+		nil,
+		multipartReq,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return respBody, nil
+}
+
+// IssueAttachFile sends request to upload an attachment to attach to issue.
+func (c *Client) IssueAttachFile(issueID string, multipartReq *resty.MultipartField) (*model.AttachmentFileResponse, error) {
+	var respBody *model.AttachmentFileResponse
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueID
+	multipartReq.Name = "filename"
+	res, err := c.SendMultipartRequest(
+		resty.MethodPost,
+		issueAttachFileURL,
+		nil,
+		nil,
+		pathParams,
+		multipartReq,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return respBody, nil
+}
+
+// IssueDeleteFile sends request to delete an attachment in issue.
+func (c *Client) IssueDeleteFile(issueID, fileID string) error {
+	pathParams := make(map[string]string)
+	pathParams["issue_id"] = issueID
+	pathParams["file_id"] = fileID
+	res, err := c.SendRequest(
+		resty.MethodDelete,
+		issueDeleteFileURL,
+		nil,
+		nil,
+		pathParams,
+		nil,
+		nil,
+	)
+	if err != nil {
+		return err
+	}
+	if res.IsError() {
+		body, _ := io.ReadAll(res.Body)
+		return fmt.Errorf("request failed with status code: %s. body: %s", res.Status(), body)
+	}
+	return nil
 }

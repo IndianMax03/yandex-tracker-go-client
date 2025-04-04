@@ -14,6 +14,13 @@ var issueGetCommentsURL = issuesBaseURL + "{issue_id}/comments"
 var issueGetCommentURL = issuesBaseURL + "{issue_id}/comments/{comment_id}"
 var issueUpdateCommentURL = issuesBaseURL + "{issue_id}/comments/{comment_id}"
 var issueDeleteCommentURL = issuesBaseURL + "{issue_id}/comments/{comment_id}"
+var issueGetAttachmentsURL = issuesBaseURL + "{issue_id}/attachments"
+var issueGetAttachmentURL = issuesBaseURL + "{issue_id}/attachments/{attachment_id}"
+var issueAttachFileURL = issuesBaseURL + "{issue_id}/attachments"
+var issueDeleteFileURL = issuesBaseURL + "{issue_id}/attachments/{file_id}"
+
+var attachmentsBase = "/attachments/"
+var attachmentUploadURL = attachmentsBase
 
 var prioritiesBaseURL = "/priorities/"
 var prioritiesGetURL = prioritiesBaseURL

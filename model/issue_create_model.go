@@ -39,6 +39,8 @@ type IssueCreateRequest struct {
 	AttachmentIds []string `json:"attachmentIds,omitempty"`
 	// IDs of temporary files that will be added to the issue description.
 	DescriptionAttachmentIds []string `json:"descriptionAttachmentIds,omitempty"`
-	// An array of objects containing information about tags.
+	// An array of strings containing information about tags.
 	Tags []string `json:"tags,omitempty"`
+	// An array of strings containing information about сomponents.
+	Components []string `json:"components,omitempty"`
 }

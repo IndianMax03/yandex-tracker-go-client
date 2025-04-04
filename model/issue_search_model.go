@@ -83,4 +83,11 @@ type IssueResponse struct {
 	Attachments []Attachment `json:"attachments"`
 	// An array of objects describing possible issue transitions
 	Transitions []Transition `json:"transitions"`
+	// An array of strings containing information about tags.
+	Tags []string `json:"tags"`
+	// An array of objects containing information about сomponents.
+	Components []IssueComponent `json:"components"`
 }
+
+// IssueComponent describes component field in issue.
+type IssueComponent ObjectBaseResponse
