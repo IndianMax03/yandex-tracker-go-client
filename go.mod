@@ -1,4 +1,4 @@
-module github.com/IndianMax03/yandex-tracker-go-client
+module github.com/IndianMax03/yandex-tracker-go-client/v3
 
 go 1.24.1
 

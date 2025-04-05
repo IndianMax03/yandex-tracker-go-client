@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strconv"
 
-	model "github.com/IndianMax03/yandex-tracker-go-client/model"
+	model "github.com/IndianMax03/yandex-tracker-go-client/v3/model"
 	"resty.dev/v3"
 )
 
